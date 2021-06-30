@@ -4,6 +4,10 @@ import { Decimal } from "decimal.js";
 
 const rates = [21.8, 33.4, 51.6, 54.6, 57.1];
 const stages = [200, 100, 300, 300];
+const MODE = {
+  kWh: "kWh",
+  W: "W",
+};
 
 function calcBill(kwh) {
   const results = [];
@@ -35,7 +39,7 @@ function calcBill(kwh) {
 }
 
 export default function Home() {
-  const [mode, setMode] = useState("basic");
+  const [mode, setMode] = useState(MODE.kWh);
   const [inputKWH, setInputKWH] = useState("");
   const [inputW, setInputW] = useState("");
   const [inputHours, setInputHours] = useState("12");
@@ -46,9 +50,9 @@ export default function Home() {
     (e) => {
       e.preventDefault();
 
-      if (mode === "basic") {
+      if (mode === MODE.kWh) {
         setBill(calcBill(inputKWH));
-      } else if (mode === "advance") {
+      } else if (mode === MODE.W) {
         const input = new Decimal(inputW);
         setBill(
           calcBill(input.dividedBy(1000).times(inputHours).times(inputDays))
@@ -63,11 +67,11 @@ export default function Home() {
   );
 
   useEffect(() => {
-    if (mode === "basic") {
+    if (mode === MODE.kWh) {
       setInputW("");
       setInputHours(12);
       setInputDays(30);
-    } else if (mode === "advance") {
+    } else if (mode === MODE.W) {
       setInputKWH("");
     }
     setBill(null);
@@ -97,25 +101,25 @@ export default function Home() {
               <button
                 type="button"
                 className={`flex-1 ${
-                  mode === "basic" ? "bg-green-700" : "bg-green-600"
-                } py-4 font-bold hover:bg-green-700 focus:bg-green-700`}
-                onClick={() => setMode("basic")}
+                  mode === MODE.kWh ? "bg-green-700" : "bg-green-600"
+                } py-4 font-semibold hover:bg-green-700 focus:bg-green-700`}
+                onClick={() => setMode(MODE.kWh)}
               >
-                Basic
+                kilowatt-hours (kWh)
               </button>
               <button
                 type="button"
                 className={`flex-1 ${
-                  mode === "advance" ? "bg-green-700" : "bg-green-600"
-                } py-4 font-bold hover:bg-green-700 focus:bg-green-700`}
-                onClick={() => setMode("advance")}
+                  mode === MODE.W ? "bg-green-700" : "bg-green-600"
+                } py-4 font-semibold hover:bg-green-700 focus:bg-green-700`}
+                onClick={() => setMode(MODE.W)}
               >
-                Advance
+                watts (W)
               </button>
             </div>
 
             <form className="grid grid-cols-3" onSubmit={calc}>
-              {mode === "basic" && (
+              {mode === MODE.kWh && (
                 <div className="col-span-full bg-white text-black py-6 px-8 flex flex-col items-start md:flex-row justify-between md:items-center mb-4">
                   <div className="pb-4 md:pb-0">Total Consumption (kWh)</div>
                   <input
@@ -128,7 +132,7 @@ export default function Home() {
                 </div>
               )}
 
-              {mode === "advance" && (
+              {mode === MODE.W && (
                 <React.Fragment>
                   <div className="col-span-full bg-white text-black py-6 px-8 flex flex-col items-start md:flex-row justify-between md:items-center mb-4">
                     <div className="pb-4 md:pb-0">Power Comsumption (W)</div>
